@@ -1,0 +1,49 @@
+@import "~sass-true/sass/true";
+@import "../src/breakpoint";
+
+@include test-module('Breakpoint') {
+
+  @include test('default breakpoints') {
+    @include assert-equal(map-keys($flexy-breakpoints), (small, medium, large, xlarge, xxlarge));
+  }
+
+  @include test('flexy-breakpoint-has') {
+    @include assert-true(flexy-breakpoint-has(small));
+    @include assert-true(flexy-breakpoint-has(medium));
+    @include assert-true(flexy-breakpoint-has(large));
+    @include assert-true(flexy-breakpoint-has(xlarge));
+    @include assert-true(flexy-breakpoint-has(xxlarge));
+  }
+
+  @include test('flexy-breakpoint-limit') {
+    // from medium to inf
+    @include assert {
+      @include output {
+        @include flexy-breakpoint-limit(medium) {
+          font-size: 2rem;
+        }
+      }
+
+      @include expect {
+        @media only screen and (min-width: 769px) {
+          font-size: 2rem;
+        }
+      }
+    }
+
+    // from medium to large
+    @include assert {
+      @include output {
+        @include flexy-breakpoint-limit(medium, large) {
+          font-size: 2rem;
+        }
+      }
+
+      @include expect {
+        @media only screen and (min-width: 769px) and (max-width: 991.9px) {
+          font-size: 2rem;
+        }
+      }
+    }
+  }
+}

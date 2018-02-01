@@ -1,0 +1,50 @@
+@import "~flexy-functions/src/functions";
+
+@import "settings";
+
+@function flexy-breakpoint-has($name) {
+  @return map-has-key($flexy-breakpoints, $name);
+}
+
+@function flexy-breakpoint-get($breakpoint) {
+  @if (flexy-breakpoint-has($breakpoint)) {
+    @return map-get($flexy-breakpoints, $breakpoint);
+  } @else {
+    @warn "#{$breakpoint} is not a set breakpoint variable";
+    @return null;
+  }
+}
+
+@mixin flexy-breakpoint($breakpoint, $screen: 'only screen') {
+  @if flexy-breakpoint-has($breakpoint) {
+    $map: (min-width: flexy-breakpoint-get($breakpoint));
+
+    @include flexy-media($map, $screen) {
+      @content;
+    }
+  } @else {
+    @warn "#{$breakpoint} is not a set breakpoint variable";
+  }
+}
+
+@mixin flexy-breakpoint-limit($breakpoint, $limit: null, $media: 'only screen') {
+  @if flexy-breakpoint-has($breakpoint) {
+    $list: ();
+
+    $list: append($list, $media);
+
+    $minWidth: flexy-breakpoint-get($breakpoint);
+    $list: append($list, '(min-width: #{$minWidth})');
+
+    @if ($limit and flexy-breakpoint-has($limit)) {
+      $maxWidth: flexy-breakpoint-get($limit) - 0.1px;
+      $list: append($list, '(max-width: #{$maxWidth})');
+    }
+
+    @media #{flexy-join($list, ' and ')} {
+      @content;
+    }
+  } @else {
+    @warn "#{$breakpoint} is not a set breakpoint variable";
+  }
+}
