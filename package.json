@@ -13,6 +13,6 @@
     "test": "jest"
   },
   "dependencies": {
-    "flexy-functions": "1.0.2"
+    "flexy-functions": "1.0.3"
   }
 }

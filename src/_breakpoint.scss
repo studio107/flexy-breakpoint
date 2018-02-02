@@ -1,5 +1,4 @@
 @import "~flexy-functions/src/functions";
-
 @import "settings";
 
 @function flexy-breakpoint-has($name) {
@@ -15,6 +14,22 @@
   }
 }
 
+@function flexy-breakpoint-step($from, $to: null) {
+  $map: (min-width: flexy-breakpoint-get($from));
+
+  @if ($to and flexy-breakpoint-has($to)) {
+    $map: map-merge((max-width: flexy-breakpoint-get($to) - .1px), $map);
+  }
+
+  @return $map;
+}
+
+@function flexy-breakpoint-next-step($from) {
+  $to: flexy-map-next-key($flexy-breakpoints, $from);
+
+  @return flexy-breakpoint-step($from, $to);
+}
+
 @mixin flexy-breakpoint($breakpoint, $screen: 'only screen') {
   @if flexy-breakpoint-has($breakpoint) {
     $map: (min-width: flexy-breakpoint-get($breakpoint));
@@ -27,24 +42,8 @@
   }
 }
 
-@mixin flexy-breakpoint-limit($breakpoint, $limit: null, $media: 'only screen') {
-  @if flexy-breakpoint-has($breakpoint) {
-    $list: ();
-
-    $list: append($list, $media);
-
-    $minWidth: flexy-breakpoint-get($breakpoint);
-    $list: append($list, '(min-width: #{$minWidth})');
-
-    @if ($limit and flexy-breakpoint-has($limit)) {
-      $maxWidth: flexy-breakpoint-get($limit) - 0.1px;
-      $list: append($list, '(max-width: #{$maxWidth})');
-    }
-
-    @media #{flexy-join($list, ' and ')} {
-      @content;
-    }
-  } @else {
-    @warn "#{$breakpoint} is not a set breakpoint variable";
+@mixin flexy-breakpoint-limit($from, $to: null, $screen: 'only screen') {
+  @include flexy-media(flexy-breakpoint-step($from, $to), $screen) {
+    @content;
   }
 }
